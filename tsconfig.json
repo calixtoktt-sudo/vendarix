@@ -13,22 +13,13 @@
     "jsx": "preserve",
     "incremental": true,
     "plugins": [{ "name": "next" }],
-<<<<<<< HEAD
-    "types": ["node"]
-	"baseUrl": ".",
-"paths": {
-  "@/*": ["./*"]
-}
-
-=======
     "types": ["node"],
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     }
->>>>>>> 9241f3ca321c85991a8c36276424e9bb66273bd2
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
-  
 }
