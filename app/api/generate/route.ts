@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateImageWithGemini } from "@/lib/gemini-image";
-import { validateGeneratePayload } from "@/lib/validate";
+import { generateImageWithGemini } from "../../../lib/gemini-image";
+import { validateGeneratePayload } from "../../../lib/validate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
