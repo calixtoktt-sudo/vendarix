@@ -579,7 +579,42 @@ function buildPrompt(step: GenerationStep, form: FormState) {
    Mock image generator (fallback)
 ---------------------------- */
 
+function ensureRoundRectPolyfill() {
+  // Nunca roda no server (Vercel/Next build)
+  if (typeof window === "undefined") return;
+
+  const proto = (window as any).CanvasRenderingContext2D?.prototype;
+  if (!proto) return;
+
+  // Polyfill só se não existir
+  if (!proto.roundRect) {
+    proto.roundRect = function (
+      this: CanvasRenderingContext2D,
+      x: number,
+      y: number,
+      w: number,
+      h: number,
+      r: number
+    ) {
+      const min = Math.min(w, h);
+      if (r > min / 2) r = min / 2;
+
+      this.beginPath();
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+      return this;
+    };
+  }
+}
+
+
 function canvasMockImage(label: string, seed: number) {
+  ensureRoundRectPolyfill();
+
   const c = document.createElement("canvas");
   c.width = 1200;
   c.height = 1200;
@@ -622,23 +657,7 @@ function canvasMockImage(label: string, seed: number) {
   ctx.fillText("(substituir pela imagem gerada)", 240, 720);
 
   return c.toDataURL("image/png");
-}
 
-// @ts-ignore
-(CanvasRenderingContext2D.prototype as any).roundRect =
-  (CanvasRenderingContext2D.prototype as any).roundRect ||
-  function (this: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-    const min = Math.min(w, h);
-    if (r > min / 2) r = min / 2;
-    this.beginPath();
-    this.moveTo(x + r, y);
-    this.arcTo(x + w, y, x + w, y + h, r);
-    this.arcTo(x + w, y + h, x, y + h, r);
-    this.arcTo(x, y + h, x, y, r);
-    this.arcTo(x, y, x + w, y, r);
-    this.closePath();
-    return this;
-  };
 
 async function mockGenerateImage(prompt: string, seed: number): Promise<string> {
   await new Promise((r) => setTimeout(r, 650 + Math.random() * 650));
